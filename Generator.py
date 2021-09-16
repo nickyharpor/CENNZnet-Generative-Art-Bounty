@@ -10,8 +10,11 @@ float_gen = lambda a, b: random.uniform(a, b)
 
 
 def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
+    cr.set_source_rgb(r, g, b)
     if shaft_type == 'simple':
-        pass
+        cr.rectangle(x, y, width, height)
+        cr.fill()
+
 
 def draw_orbit(cr, line, x, y, radius, r, g, b):
     cr.set_line_width(line)
@@ -46,70 +49,17 @@ def main():
     parser.add_argument("--height", help="Specify Height", default=2000, type=int)
     parser.add_argument("-o", "--orbit", help="Actual Orbits", action="store_true")
     parser.add_argument("-l", "--line", help=".", action="store_true")
-    parser.add_argument("-s", "--sunsize", help=".", default=random.randint(200, 400), type=int)
-    parser.add_argument("-bs", "--bordersize", help=".", default=50, type=int)
     parser.add_argument("-n", "--noise", help="Texture", default=.4, type=float)
     args = parser.parse_args()
 
     width, height = args.width, args.height
-    border_size = args.bordersize
-    sun_size = args.sunsize
-
-    sun_center = height - border_size
 
     ims = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
     cr = cairo.Context(ims)
 
     draw_background(cr, .3, .3, .3, width, height)
 
-
-
-    ###
-
-    sun_color = random.choice(list_of_colors)
-    sun_r, sun_g, sun_b = sun_color[0] / 255.0, sun_color[1] / 255.0, sun_color[2] / 255.0
-
-    draw_circle_fill(cr, width / 2, sun_center, sun_size, sun_r, sun_g, sun_b)
-
-    distance_between_planets = 20
-    last_center = sun_center
-    last_size = sun_size
-    last_color = sun_color
-
-    min_size = 5
-    max_size = 70
-
-    for x in range(1, 20):
-        next_size = random.randint(min_size, max_size)
-        next_center = last_center - last_size - (next_size * 2) - distance_between_planets
-
-        if not (next_center - next_size < border_size):
-            if (args.orbit):
-                draw_orbit(cr, 4, width / 2, sun_center, height - next_center - border_size, .6, .6, .6)
-            elif (args.line):
-                cr.move_to(border_size * 2, next_center)
-                cr.line_to(width - (border_size * 2), next_center)
-                cr.stroke()
-
-            draw_circle_fill(cr, width / 2, next_center, next_size * 1.3, .3, .3, .3)
-
-            rand_color = random.choice(list_of_colors)
-            while (rand_color is last_color):
-                rand_color = random.choice(list_of_colors)
-
-            last_color = rand_color
-
-            r, g, b = rand_color[0] / 255.0, rand_color[1] / 255.0, rand_color[2] / 255.0
-
-            draw_circle_fill(cr, width / 2, next_center, next_size, r, g, b)
-
-            last_center = next_center
-            last_size = next_size
-
-            min_size += 5
-            max_size += 5 * x
-
-    draw_border(cr, border_size, sun_r, sun_g, sun_b, width, height)
+    
 
     ims.write_to_png('Examples/Generative-Space-Flat-' + str(width) + 'w-' + str(height) + 'h.png')
 
