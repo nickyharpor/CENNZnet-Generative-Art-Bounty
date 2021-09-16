@@ -9,6 +9,10 @@ list_of_colors = [(145, 185, 141), (229, 192, 121), (210, 191, 88), (140, 190, 1
 float_gen = lambda a, b: random.uniform(a, b)
 
 
+def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
+    if shaft_type == 'simple':
+        pass
+
 def draw_orbit(cr, line, x, y, radius, r, g, b):
     cr.set_line_width(line)
     cr.arc(x, y, radius, 0, 2 * math.pi)
@@ -58,6 +62,10 @@ def main():
 
     draw_background(cr, .3, .3, .3, width, height)
 
+
+
+    ###
+
     sun_color = random.choice(list_of_colors)
     sun_r, sun_g, sun_b = sun_color[0] / 255.0, sun_color[1] / 255.0, sun_color[2] / 255.0
 
@@ -71,7 +79,7 @@ def main():
     min_size = 5
     max_size = 70
 
-    for x in xrange(1, 20):
+    for x in range(1, 20):
         next_size = random.randint(min_size, max_size)
         next_center = last_center - last_size - (next_size * 2) - distance_between_planets
 
