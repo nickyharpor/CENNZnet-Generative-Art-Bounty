@@ -1,5 +1,5 @@
-import cairo, PIL, argparse, math, random
-from PIL import Image, ImageDraw
+import cairo, argparse, math, random
+from PIL import Image
 
 list_of_colors = [(145, 185, 141), (229, 192, 121), (210, 191, 88), (140, 190, 178), (255, 183, 10), (189, 190, 220),
                   (221, 79, 91), (16, 182, 98), (227, 146, 80), (241, 133, 123), (110, 197, 233), (235, 205, 188),
@@ -8,18 +8,21 @@ list_of_colors = [(145, 185, 141), (229, 192, 121), (210, 191, 88), (140, 190, 1
 
 float_gen = lambda a, b: random.uniform(a, b)
 
-def draw_fill_and_stroke(cr, do_fill, do_stroke, r, g, b):
+
+def conjure_unique_codename(r, g, b, d_length, d_girth, shaft_type, head_type, tail_type, has_balls):
+    codename = head_type + d_length + d_girth + shaft_type + r + g + b + tail_type + has_balls
+    return codename
+
+
+def draw_tail(cr, x, y, rx, ry, rotation, r, g, b, start_angle=0, end_angle=360):
     cr.save()
-
-    if do_stroke:
-        cr.set_source_rgb(r, g, b)
-        cr.stroke_preserve()
-
-    if do_fill:
-        cr.set_source_rgb(r, g, b)
-        cr.fill_preserve()
-
+    cr.set_source_rgb(r, g, b)
+    cr.translate(x, y)
+    cr.rotate(rotation * math.pi)
+    cr.scale(rx * 0.01, ry * 0.01)
+    cr.arc(0, 0, 100, start_angle * math.pi / 180, end_angle * math.pi / 180)
     cr.restore()
+    cr.fill()
 
 
 def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
@@ -46,20 +49,17 @@ def draw_balls(cr, x, y, width, height, scale_x, scale_y, rotation, r, g, b):
     x3 = 0
     y3 = 0.5
 
+    cr.save()
+    cr.set_source_rgb(r, g, b)
     cr.translate(x, y)
     cr.scale(scale_x, scale_y)
     cr.rotate(rotation*math.pi)
-
-    cr.save()
-
     cr.scale(width, height)
     cr.move_to(x0, y0)
     cr.curve_to(x1, y1, x2, y2, x3, y3)
     cr.curve_to(-x2, y2, -x1, y1, -x0, y0)
-
     cr.restore()
-
-    draw_fill_and_stroke(cr, True, False, r, g, b)
+    cr.fill()
 
 
 def draw_orbit(cr, line, x, y, radius, r, g, b):
@@ -102,6 +102,7 @@ def main():
 
     # background
     back_r, back_g, back_b = random.random(), random.random(), random.random()
+    back_r, back_g, back_b = 0.8, 0.8, 0.8
     draw_background(cr, back_r, back_g, back_b, width, height)
 
     # dildo color
@@ -121,10 +122,15 @@ def main():
     d_neck_x = width/10
     d_neck_y = height/10
 
+    # custom
+    d_height = d_height/1.2
+    d_neck_x = (width - d_height)/2
+
     # draw dildo
     draw_shaft(cr, d_neck_x, d_neck_y, 'simple', d_height, d_girth, d_r, d_g, d_b)
     draw_head(cr, d_neck_x, d_neck_y+(d_girth/2), 'simple', d_girth/2, d_r, d_g, d_b)
     draw_balls(cr, d_neck_x + d_height - 100, d_neck_y + d_girth, 200, 200, 1, 1, 1, d_r, d_g, d_b)
+    draw_tail(cr, d_neck_x + d_height, d_neck_y + d_girth/2, d_height/50, d_girth/1.7, 0, d_r, d_g, d_b)
 
     ims.write_to_png('Examples/Generative-Space-Flat-' + str(width) + 'w-' + str(height) + 'h.png')
 
