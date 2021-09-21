@@ -14,6 +14,20 @@ def conjure_unique_codename(r, g, b, d_length, d_girth, shaft_type, head_type, t
     return codename
 
 
+def write_codename(cr, codename, font_size, thickness, x, y, r, g, b):
+    cr.save()
+    cr.set_source_rgb(r, g, b)
+    cr.set_font_size(font_size)
+    cr.select_font_face("Arial",
+                      cairo.FONT_SLANT_NORMAL,
+                      cairo.FONT_WEIGHT_NORMAL)
+    cr.move_to(x, y)
+    cr.text_path(codename)
+    cr.set_line_width(thickness)
+    cr.stroke()
+    cr.restore()
+
+
 def draw_tail(cr, x, y, rx, ry, rotation, r, g, b, start_angle=0, end_angle=360):
     cr.save()
     cr.set_source_rgb(r, g, b)
@@ -101,8 +115,8 @@ def main():
     cr = cairo.Context(ims)
 
     # background
-    back_r, back_g, back_b = random.random(), random.random(), random.random()
-    back_r, back_g, back_b = 0.8, 0.8, 0.8
+    back_r, back_g, back_b = 0.2, 0.2, 0.2
+    codename_r, codename_g, codename_b = 0.2, 0.2, 0.2
     draw_background(cr, back_r, back_g, back_b, width, height)
 
     # dildo color
@@ -127,6 +141,7 @@ def main():
     d_neck_x = (width - d_height)/2
 
     # draw dildo
+    write_codename(cr, 'F89LK02Y78392BB', 192, 7, width/10, 3*height/4, codename_r, codename_g, codename_b)
     draw_shaft(cr, d_neck_x, d_neck_y, 'simple', d_height, d_girth, d_r, d_g, d_b)
     draw_head(cr, d_neck_x, d_neck_y+(d_girth/2), 'simple', d_girth/2, d_r, d_g, d_b)
     draw_balls(cr, d_neck_x + d_height - 100, d_neck_y + d_girth, 200, 200, 1, 1, 1, d_r, d_g, d_b)
