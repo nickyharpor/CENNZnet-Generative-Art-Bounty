@@ -30,6 +30,36 @@ def write_codename(cr, codename, font_size, thickness, x, y, r, g, b):
     cr.restore()
 
 
+def draw_crown(cr, x, y, crown_type, width, height, r, g, b):
+    if crown_type == 'N':  # none
+        pass
+    elif crown_type == 'B':  # bump
+        if r > 0.9:
+            xr = 1
+        else:
+            xr = r + 0.1
+        if g > 0.9:
+            xg = 1
+        else:
+            xg = g + 0.1
+        if b > 0.9:
+            xb = 1
+        else:
+            xb = b + 0.1
+        bump = 1
+        while width/bump > height:
+            bump += 1
+        bump -= 1
+        jump = width/bump
+        iter_hump = 0
+        cr.set_source_rgb(xr, xg, xb)
+        while iter_hump < bump:
+            cr.arc(x+jump/2+(iter_hump*jump), y+height/2, jump/5, 0, 2*math.pi)
+            cr.fill()
+            iter_hump += 1
+        cr.set_source_rgb(r, g, b)
+
+
 def draw_tail(cr, x, y, tail_type, rx, ry, rotation, r, g, b, start_angle=0, end_angle=360):
     if tail_type == 'N':  # none
         pass
@@ -42,6 +72,20 @@ def draw_tail(cr, x, y, tail_type, rx, ry, rotation, r, g, b, start_angle=0, end
         cr.arc(0, 0, 100, start_angle * math.pi / 180, end_angle * math.pi / 180)
         cr.restore()
         cr.fill()
+    elif tail_type == 'T':  # trapezoid
+        cr.save()
+        cr.move_to(x - rx*20, y)
+        cr.line_to(x + rx*2, y - ry)
+        cr.line_to(x + rx*2, y + ry)
+        cr.fill()
+        cr.restore()
+    elif tail_type == 'C':  # cone
+        cr.save()
+        cr.move_to(x - rx*4, y)
+        cr.line_to(x + rx*2, y - ry)
+        cr.line_to(x + rx*2, y + ry)
+        cr.fill()
+        cr.restore()
 
 
 def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
@@ -138,6 +182,16 @@ def draw_balls(cr, x, y, ball_type, width, height, scale_x, scale_y, rotation, r
         cr.curve_to(-x2, y2, -x1, y1, -x0, y0)
         cr.restore()
         cr.fill()
+    elif ball_type == 'S':  # snake
+        cr.save()
+        x = x + width/2
+        cr.move_to(x, y)
+        cr.curve_to(x - width/4, y + height/3, x - width/3, y + height/2, x - 3*width/2, y + height/2)
+        cr.curve_to(x - 4*width/10, y + height/3, x - 3*width/10, y + height/4, x - width/5, y)
+        cr.line_to(x, y)
+        cr.close_path()
+        cr.fill()
+        cr.restore()
 
 
 def draw_background(cr, r, g, b, width, height):
@@ -184,21 +238,23 @@ def main():
     shaft_type = shaft_list[random.randint(0, len(shaft_list)-1)]
     head_list = ['R', 'P']
     head_type = head_list[random.randint(0, len(head_list)-1)]
-    tail_list = ['N', 'U']
+    tail_list = ['N', 'U', 'T', 'C', 'C', 'C']
     tail_type = tail_list[random.randint(0, len(tail_list)-1)]
-    ball_list = ['N', 'H']
+    ball_list = ['N', 'H', 'S']
     ball_type = ball_list[random.randint(0, len(ball_list)-1)]
-    crown_type = 'N'
+    crown_list = ['N', 'B', 'N', 'N']
+    crown_type = crown_list[random.randint(0, len(crown_list)-1)]
 
     # codename (16 char)
     codename = conjure_codename(d_r, d_g, d_b, d_height, d_girth, shaft_type, head_type, tail_type, ball_type, crown_type)
-    write_codename(cr, codename, 110, 4, (width/2)-(8*70), 5*height/6, codename_r, codename_g, codename_b)
+    write_codename(cr, codename, 110, 4, (width/2)-(8*70), 7*height/8, codename_r, codename_g, codename_b)
 
     # draw dildo
     draw_shaft(cr, d_neck_x, d_neck_y, shaft_type, d_height, d_girth, d_r, d_g, d_b)
     draw_head(cr, d_neck_x, d_neck_y, head_type, d_girth, d_r, d_g, d_b)
     draw_balls(cr, d_neck_x + d_height - 3*d_girth/4, d_neck_y + d_girth, ball_type, d_girth, d_girth, 1, 1, 1, d_r, d_g, d_b)
     draw_tail(cr, d_neck_x + d_height, d_neck_y + d_girth/2, tail_type, d_height/50, d_girth/1.7, 0, d_r, d_g, d_b)
+    draw_crown(cr, d_neck_x, d_neck_y, crown_type, d_height, d_girth, d_r, d_g, d_b)
 
     ims.write_to_png('Examples/tmp.png')
 
