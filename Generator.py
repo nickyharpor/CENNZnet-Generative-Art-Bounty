@@ -60,12 +60,14 @@ def draw_crown(cr, x, y, crown_type, width, height, r, g, b):
         cr.set_source_rgb(r, g, b)
 
 
+
+
 def draw_tail(cr, x, y, tail_type, rx, ry, rotation, r, g, b, start_angle=0, end_angle=360):
+    cr.set_source_rgb(r, g, b)
     if tail_type == 'N':  # none
         pass
     elif tail_type == 'U':  # u-like
         cr.save()
-        cr.set_source_rgb(r, g, b)
         cr.translate(x, y)
         cr.rotate(rotation * math.pi)
         cr.scale(rx * 0.01, ry * 0.01)
@@ -85,6 +87,18 @@ def draw_tail(cr, x, y, tail_type, rx, ry, rotation, r, g, b, start_angle=0, end
         cr.line_to(x + rx*2, y - ry)
         cr.line_to(x + rx*2, y + ry)
         cr.fill()
+        cr.restore()
+    elif tail_type == 'A':  # arc
+        cr.save()
+        cr.arc(x, y, ry/1.5, -math.pi/3, math.pi/3)
+        cr.set_line_width(ry/4)
+        cr.stroke()
+        cr.restore()
+        cr.save()
+        cr.set_line_width(ry/2)
+        cr.move_to(x, y)
+        cr.line_to(x+ry/1.5, y)
+        cr.stroke()
         cr.restore()
 
 
@@ -124,6 +138,68 @@ def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
         while iter_thorn < repeat:
             draw_thorn_upward(cr, x+(iter_thorn*(width/repeat)), y, width/repeat, height/4)
             iter_thorn += 1
+    elif shaft_type == 'X':  # x
+        cr.rectangle(x, y, width, height)
+        cr.fill()
+        bump = 1
+        while width/bump > height:
+            bump += 1
+        bump -= 1
+        jump = width/bump
+        iter_hump = 0
+        first, last = True, False
+        c_y = y+height/2
+        c_s = jump/2
+        while iter_hump < bump:
+            if not first and not last:
+                c_x = x+jump/2+(iter_hump*jump)
+                cr.save()
+                cr.set_line_width(c_s/1.5)
+                cr.move_to(c_x+c_s, c_y+c_s)
+                cr.line_to(c_x-c_s, c_y-c_s)
+                cr.stroke()
+                cr.restore()
+                if bump - iter_hump == 2:
+                    last = True
+            else:
+                first = False
+            iter_hump += 1
+    elif shaft_type == 'W':  # x + h
+        cr.rectangle(x, y, width, height)
+        cr.fill()
+        hump = 1
+        while width/hump > height:
+            hump += 1
+        hump -= 1
+        jump = width/hump
+        iter_hump = 0
+        while iter_hump < hump:
+            cr.arc(x+jump/2+(iter_hump*jump), y+height/2, jump/2, 0, 2*math.pi)
+            cr.fill()
+            iter_hump += 1
+        bump = 1
+        while width/bump > height:
+            bump += 1
+        bump -= 1
+        jump = width/bump
+        iter_hump = 0
+        first, last = True, False
+        c_y = y+height/2
+        c_s = jump/2
+        while iter_hump < bump:
+            if not first and not last:
+                c_x = x+jump/2+(iter_hump*jump)
+                cr.save()
+                cr.set_line_width(c_s/1.5)
+                cr.move_to(c_x+c_s, c_y+c_s)
+                cr.line_to(c_x-c_s, c_y-c_s)
+                cr.stroke()
+                cr.restore()
+                if bump - iter_hump == 2:
+                    last = True
+            else:
+                first = False
+            iter_hump += 1
 
 
 def draw_thorn_upward(cr, x, y, width, height):
@@ -156,6 +232,15 @@ def draw_head(cr, x, y, head_type, radius, r, g, b):
             cr.line_to(x-radius/2, y+radius/2)
         cr.fill()
         cr.restore()
+    elif head_type == 'B':  # ball
+        cr.save()
+        cr.move_to(x, y)
+        cr.line_to(x, y+radius)
+        cr.line_to(x-radius/2, y+radius/2)
+        cr.fill()
+        cr.restore()
+        cr.arc(x-radius/3, y+radius/2, radius/4, 0, 2*math.pi)
+        cr.fill()
 
 
 def draw_balls(cr, x, y, ball_type, width, height, scale_x, scale_y, rotation, r, g, b):
@@ -234,15 +319,15 @@ def main():
     d_neck_y = (2*height/3 - d_girth)/2
 
     # custom
-    shaft_list = ['S', 'V', 'H', 'T']
+    shaft_list = ['S', 'V', 'H', 'T', 'X', 'X', 'W', 'W']
     shaft_type = shaft_list[random.randint(0, len(shaft_list)-1)]
-    head_list = ['R', 'P']
+    head_list = ['R', 'P', 'B', 'B', 'B']
     head_type = head_list[random.randint(0, len(head_list)-1)]
-    tail_list = ['N', 'U', 'T', 'C', 'C', 'C']
+    tail_list = ['N', 'U', 'T', 'C', 'A', 'A', 'A', 'A', 'A', 'A']
     tail_type = tail_list[random.randint(0, len(tail_list)-1)]
     ball_list = ['N', 'H', 'S']
     ball_type = ball_list[random.randint(0, len(ball_list)-1)]
-    crown_list = ['N', 'B', 'N', 'N']
+    crown_list = ['N', 'B', 'N', 'N', 'N', 'N']
     crown_type = crown_list[random.randint(0, len(crown_list)-1)]
 
     # codename (16 char)
