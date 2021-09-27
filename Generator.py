@@ -1,11 +1,6 @@
 import cairo, argparse, math, random, os
 from PIL import Image
 
-list_of_colors = [(145, 185, 141), (229, 192, 121), (210, 191, 88), (140, 190, 178), (255, 183, 10), (189, 190, 220),
-                  (221, 79, 91), (16, 182, 98), (227, 146, 80), (241, 133, 123), (110, 197, 233), (235, 205, 188),
-                  (197, 239, 247), (190, 144, 212),
-                  (41, 241, 195), (101, 198, 187), (255, 246, 143), (243, 156, 18), (189, 195, 199), (243, 241, 239)]
-
 float_gen = lambda a, b: random.uniform(a, b)
 
 
@@ -58,8 +53,74 @@ def draw_crown(cr, x, y, crown_type, width, height, r, g, b):
             cr.fill()
             iter_hump += 1
         cr.set_source_rgb(r, g, b)
-
-
+    elif crown_type == 'H':  # heart
+        if r > 0.8:
+            xr = 1
+        else:
+            xr = r + 0.2
+        if g > 0.8:
+            xg = 1
+        else:
+            xg = g + 0.2
+        if b > 0.8:
+            xb = 1
+        else:
+            xb = b + 0.2
+        bump = 1
+        while width/bump > height:
+            bump += 1
+        bump -= 1
+        jump = width/bump
+        iter_hump = 0
+        cr.set_source_rgb(xr, xg, xb)
+        x0 = 0
+        y0 = -0.25
+        x1 = 0.2
+        y1 = -0.8
+        x2 = 1.1
+        y2 = -0.2
+        x3 = 0
+        y3 = 0.5
+        while iter_hump < bump:
+            cr.save()
+            cr.translate(x+jump/2+(iter_hump*jump), y+height/2)
+            cr.scale(jump/2, jump/2)
+            cr.move_to(x0, y0)
+            cr.curve_to(x1, y1, x2, y2, x3, y3)
+            cr.curve_to(-x2, y2, -x1, y1, -x0, y0)
+            cr.fill()
+            cr.restore()
+            iter_hump += 1
+        cr.set_source_rgb(r, g, b)
+    elif crown_type == 'L':  # line
+        if r > 0.85:
+            xr = 1
+        else:
+            xr = r + 0.15
+        if g > 0.85:
+            xg = 1
+        else:
+            xg = g + 0.15
+        if b > 0.85:
+            xb = 1
+        else:
+            xb = b + 0.15
+        cr.set_source_rgb(xr, xg, xb)
+        repeat = 20
+        iter_line = 0
+        first = True
+        while iter_line < repeat:
+            if not first:
+                cr.save()
+                cr.set_line_width(5)
+                cr.move_to(x+(iter_line*(width/repeat)), y + height/4)
+                cr.line_to(x+(iter_line*(width/repeat)), y + 3*height/4)
+                cr.stroke()
+                cr.restore()
+            else:
+                first = False
+            iter_line += 1
+        cr.set_source_rgb(r, g, b)
 
 
 def draw_tail(cr, x, y, tail_type, rx, ry, rotation, r, g, b, start_angle=0, end_angle=360):
@@ -100,6 +161,12 @@ def draw_tail(cr, x, y, tail_type, rx, ry, rotation, r, g, b, start_angle=0, end
         cr.line_to(x+ry/1.5, y)
         cr.stroke()
         cr.restore()
+    elif tail_type == 'R':  # ring
+        cr.save()
+        cr.set_line_width(ry/3.5)
+        cr.arc(x, y, ry/1.4, 0, 2*math.pi)
+        cr.stroke()
+        cr.restore()
 
 
 def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
@@ -135,8 +202,14 @@ def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
         cr.fill()
         repeat = 10
         iter_thorn = 0
+        first, last = True, False
         while iter_thorn < repeat:
-            draw_thorn_upward(cr, x+(iter_thorn*(width/repeat)), y, width/repeat, height/4)
+            if not first and not last:
+                draw_thorn_upward(cr, x+(iter_thorn*(width/repeat)), y, width/repeat, height/4)
+            else:
+                first = False
+            if repeat - iter_thorn < 2:
+                last = True
             iter_thorn += 1
     elif shaft_type == 'X':  # x
         cr.rectangle(x, y, width, height)
@@ -164,7 +237,7 @@ def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
             else:
                 first = False
             iter_hump += 1
-    elif shaft_type == 'W':  # x + h
+    elif shaft_type == 'Q':  # x + h
         cr.rectangle(x, y, width, height)
         cr.fill()
         hump = 1
@@ -241,6 +314,25 @@ def draw_head(cr, x, y, head_type, radius, r, g, b):
         cr.restore()
         cr.arc(x-radius/3, y+radius/2, radius/4, 0, 2*math.pi)
         cr.fill()
+    elif head_type == 'G':  # g-shape
+        x0 = 0
+        y0 = -0.25
+        x1 = 0.2
+        y1 = -0.8
+        x2 = 1.1
+        y2 = -0.2
+        x3 = 0
+        y3 = 0.5
+        cr.save()
+        cr.set_source_rgb(r, g, b)
+        cr.translate(x, y+radius/2)
+        cr.rotate(math.pi/2)
+        cr.scale(radius*1.2, radius)
+        cr.move_to(x0, y0)
+        cr.curve_to(x1, y1, x2, y2, x3, y3)
+        cr.curve_to(-x2, y2, -x1, y1, -x0, y0)
+        cr.fill()
+        cr.restore()
 
 
 def draw_balls(cr, x, y, ball_type, width, height, scale_x, scale_y, rotation, r, g, b):
@@ -277,6 +369,18 @@ def draw_balls(cr, x, y, ball_type, width, height, scale_x, scale_y, rotation, r
         cr.close_path()
         cr.fill()
         cr.restore()
+    elif ball_type == 'J':  # jingle
+        cr.save()
+        x = x + width/2
+        cr.move_to(x, y)
+        cr.curve_to(x - width/4, y + height/3, x - width/3, y + height/2, x - 3*width/2, y + height/2)
+        cr.curve_to(x - 4*width/10, y + height/4, x - 3*width/10, y + height/6, x - width/5, y)
+        cr.line_to(x, y)
+        cr.close_path()
+        cr.fill()
+        cr.restore()
+        cr.arc(x - 3*width/2 + 5, y + height/2, height/10, 0, 2*math.pi)
+        cr.fill()
 
 
 def draw_background(cr, r, g, b, width, height):
@@ -305,11 +409,11 @@ def main():
     d_r = round(random.random(), 2)
     d_g = round(random.random(), 2)
     d_b = round(random.random(), 2)
-    while abs(d_r - back_r) < 0.1:
+    while abs(d_r - back_r) < 0.1 or d_r > 0.99:
         d_r = round(random.random(), 2)
-    while abs(d_g - back_g) < 0.1:
+    while abs(d_g - back_g) < 0.1 or d_g > 0.99:
         d_g = round(random.random(), 2)
-    while abs(d_b - back_b) < 0.1:
+    while abs(d_b - back_b) < 0.1 or d_b > 0.99:
         d_b = round(random.random(), 2)
 
     # dildo size and position
@@ -319,15 +423,15 @@ def main():
     d_neck_y = (2*height/3 - d_girth)/2
 
     # custom
-    shaft_list = ['S', 'V', 'H', 'T', 'X', 'X', 'W', 'W']
+    shaft_list = ['S', 'V', 'H', 'T', 'X', 'X', 'Q', 'Q', 'Q', 'Q']
     shaft_type = shaft_list[random.randint(0, len(shaft_list)-1)]
-    head_list = ['R', 'P', 'B', 'B', 'B']
+    head_list = ['R', 'P', 'B', 'G', 'G']
     head_type = head_list[random.randint(0, len(head_list)-1)]
-    tail_list = ['N', 'U', 'T', 'C', 'A', 'A', 'A', 'A', 'A', 'A']
+    tail_list = ['N', 'U', 'T', 'C', 'A', 'R', 'R', 'R', 'R', 'R']
     tail_type = tail_list[random.randint(0, len(tail_list)-1)]
-    ball_list = ['N', 'H', 'S']
+    ball_list = ['N', 'H', 'S', 'J', 'J', 'J']
     ball_type = ball_list[random.randint(0, len(ball_list)-1)]
-    crown_list = ['N', 'B', 'N', 'N', 'N', 'N']
+    crown_list = ['N', 'B', 'H', 'L', 'L', 'L']
     crown_type = crown_list[random.randint(0, len(crown_list)-1)]
 
     # codename (16 char)
