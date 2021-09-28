@@ -434,7 +434,7 @@ def main():
     crown_list = ['N', 'B', 'H', 'L']
     crown_type = crown_list[random.randint(0, len(crown_list)-1)]
 
-    # codename (16 char)
+    # codename (17 char)
     codename = conjure_codename(d_r, d_g, d_b, d_height, d_girth, shaft_type, head_type, tail_type, ball_type, crown_type)
     write_codename(cr, codename, 110, 4, (width/2)-(8*70), 7*height/8, codename_r, codename_g, codename_b)
 

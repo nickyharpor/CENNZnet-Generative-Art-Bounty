@@ -19,7 +19,7 @@ friends, try your luck and see whose is bigger :grin:.
 
 ![collage](collage.jpg)
 
-Every dildo has a unique and searchable 16-character codename which can be
+Every dildo has a unique and searchable 17-character codename which can be
 used to generate the exact same image again. All elements are customizable 
 and combinable. They create endless possibilities of shape, size, and color. 
 Check out the `Samples` folder for more images. Everything is created with
