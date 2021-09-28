@@ -205,10 +205,10 @@ def draw_shaft(cr, x, y, shaft_type, width, height, r, g, b):
         first, last = True, False
         while iter_thorn < repeat:
             if not first and not last:
-                draw_thorn_upward(cr, x+(iter_thorn*(width/repeat)), y, width/repeat, height/4)
+                draw_thorn_upward(cr, x+(iter_thorn*(width/repeat)), y, width/repeat, height/6)
             else:
                 first = False
-            if repeat - iter_thorn < 2:
+            if repeat - iter_thorn == 2:
                 last = True
             iter_thorn += 1
     elif shaft_type == 'X':  # x
@@ -423,15 +423,15 @@ def main():
     d_neck_y = (2*height/3 - d_girth)/2
 
     # custom
-    shaft_list = ['S', 'V', 'H', 'T', 'X', 'X', 'Q', 'Q', 'Q', 'Q']
+    shaft_list = ['T'] #['S', 'V', 'H', 'T', 'X', 'Q']
     shaft_type = shaft_list[random.randint(0, len(shaft_list)-1)]
-    head_list = ['R', 'P', 'B', 'G', 'G']
+    head_list = ['R', 'P', 'B', 'G']
     head_type = head_list[random.randint(0, len(head_list)-1)]
-    tail_list = ['N', 'U', 'T', 'C', 'A', 'R', 'R', 'R', 'R', 'R']
+    tail_list = ['N', 'U', 'T', 'C', 'A', 'R']
     tail_type = tail_list[random.randint(0, len(tail_list)-1)]
-    ball_list = ['N', 'H', 'S', 'J', 'J', 'J']
+    ball_list = ['N', 'H', 'S', 'J']
     ball_type = ball_list[random.randint(0, len(ball_list)-1)]
-    crown_list = ['N', 'B', 'H', 'L', 'L', 'L']
+    crown_list = ['N', 'B', 'H', 'L']
     crown_type = crown_list[random.randint(0, len(crown_list)-1)]
 
     # codename (16 char)
@@ -445,9 +445,9 @@ def main():
     draw_tail(cr, d_neck_x + d_height, d_neck_y + d_girth/2, tail_type, d_height/50, d_girth/1.7, 0, d_r, d_g, d_b)
     draw_crown(cr, d_neck_x, d_neck_y, crown_type, d_height, d_girth, d_r, d_g, d_b)
 
-    ims.write_to_png('Examples/tmp.png')
+    ims.write_to_png('Samples/tmp.png')
 
-    pil_image = Image.open('Examples/tmp.png')
+    pil_image = Image.open('Samples/tmp.png')
     pixels = pil_image.load()
 
     for i in range(pil_image.size[0]):
@@ -456,9 +456,14 @@ def main():
             noise = float_gen(1.0 - args.noise, 1.0 + args.noise)
             pixels[i, j] = (int(r * noise), int(g * noise), int(b * noise))
 
-    pil_image.save('Examples/' + codename + '.png')
-    os.remove('Examples/tmp.png')
+    pil_image.save('Samples/' + codename + '.png')
+    os.remove('Samples/tmp.png')
 
 
 if __name__ == "__main__":
     main()
+    #n = 1000
+    #while n > 0:
+    #    main()
+    #    print(n)
+    #   n -= 1

@@ -17,7 +17,7 @@ DeLdo, as the name suggests, is a dildo image generator with the aim of
 making NFTs funny and sexy. Next time you decide to have fun with your 
 friends, try your luck and see whose is bigger :grin:.
 
-![gif](B524W880N57N60N60.png)
+![collage](collage.jpg)
 
 Every dildo has a unique and searchable 16-character codename which can be
 used to generate the exact same image again. All elements are customizable 
@@ -29,5 +29,10 @@ Check out the `Samples` folder for more images. Everything is created with
 python3 Generator.py
 ```
 
+![sample](Samples/B854V119U55H56N80.png)
 
+![sample](Samples/R414Q121R83N45H50.png)
 
+![sample](Samples/G836Q120N77J55B73.png)
+
+![sample](Samples/P424V800U60S80H97.png)
